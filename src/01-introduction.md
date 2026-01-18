@@ -21,7 +21,7 @@ reading.
 
 TODO: comparisons
 
-* OS: Talos Linux
-* CRI: containerd
-* CNI: calico
-* CSI: rook/ceph
+- OS: Talos Linux
+- CRI: containerd
+- CNI: calico
+- CSI: rook/ceph

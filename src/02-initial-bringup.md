@@ -209,20 +209,14 @@ spec: {}
 
 Congratulations! You have a cluster! Here's a brief summary of what we just did:
 
-* Download Talos Linux and flash it to a USB drive
-* Boot Talos Linux on all nodes
-* Generate certificates for the Talos & Kubernetes API servers
-* Write patch files for each node based on information we retrieved from the CLI
-* Install Talos into the nodes
-* Configure kubectl to control the Talos cluster
-* Install Calico CNI
-
-In the next section, you'll learn how to set up CertManager - an ACME-compatible
-operator for issuing TLS certificates, and after that, ArgoCD. ArgoCD is what's
-called a GitOps platform, which allows you to track everything you do to your
-cluster in Git. This makes it a lot easier to manage your applications, because
-you'll be able to track your cluster configuration in version control.
-
-This book will show you many other things you can do with a Kubernetes cluster,
-but I highly recommend you stick with me through section 3 (ArgoCD), because it
-will prevent a lot of headaches down the line.
+- Download Talos Linux and flash it to a USB drive
+- Boot Talos Linux on all nodes
+- Generate certificates for the Talos & Kubernetes API servers
+- Write patch files for each node based on information we retrieved from the CLI
+- Install Talos into the nodes
+- Configure kubectl to control the Talos cluster
+- Install Calico CNI
+- Of the 4 main requirements for Kubernetes, we have installed:
+  - OS
+  - CRI
+  - CNI
