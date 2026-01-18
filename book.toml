@@ -1,0 +1,6 @@
+[book]
+authors = ["Shaun Keys"]
+language = "en"
+multilingual = false
+src = "src"
+title = "My Kubernetes Stack - One of Many"
