@@ -3,3 +3,6 @@ authors = ["Shaun Keys"]
 language = "en"
 src = "src"
 title = "My Kubernetes Stack - One of Many"
+
+[output.html.code.hidelines]
+yaml = "~"
