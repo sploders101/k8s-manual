@@ -45,7 +45,7 @@ TODO: comparisons
 | Container Storage Interface (CSI) | Rook (Ceph) | ✅️ |
 | Certificate management | CertManager | ❌️ (recommended) |
 | Ingress / Gateway API controller | Traefik | ❌️ (recommended) |
-| GitOps | ArgoCD | ❌️ (recommended) |
+| GitOps | FluxCD | ❌️ (recommended) |
 | Postgres databases | Cloud-Native Postgres (CNPG) | ❌️ |
 | Virtual machine management | KubeVirt | ❌️ |
 

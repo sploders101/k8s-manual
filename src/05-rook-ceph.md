@@ -71,8 +71,8 @@ greatly helpful for things like upgrades where resources may be added,
 modified, or removed, and can be difficult to keep track of by hand.
 
 Normally, I would recommend tracking everything in a GitOps platform like
-ArgoCD, but since Ceph provides the CSI that ArgoCD needs in order to run
-properly, we unfortunately cannot use ArgoCD yet.
+FluxCD, but since Ceph provides the CSI that FluxCD needs in order to run
+properly, we unfortunately cannot use FluxCD yet.
 
 ### Install Rook Ceph Operator
 
