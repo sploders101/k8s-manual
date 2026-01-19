@@ -41,7 +41,7 @@ TODO: comparisons
 | Operating System (OS) | Talos Linux | ✅️ |
 | Container Runtime Interface (CRI) | Containerd | ✅️ |
 | Container Network Interface (CNI) | Calico | ✅️ |
-| Load Balancer | MetalLB | ❌️(recommended) |
+| Load Balancer | MetalLB | ❌️ (recommended) |
 | Container Storage Interface (CSI) | Rook (Ceph) | ✅️ |
 | Certificate management | CertManager | ❌️ (recommended) |
 | Ingress / Gateway API controller | Traefik | ❌️ (recommended) |
@@ -72,3 +72,15 @@ you already have a solid foundation in the following areas:
   - Routing
   - DHCP
   - ARP
+
+### What to do if you're not ready
+
+You may be able to get by without expertise in some of these areas, but expect
+to do a lot of Googling and YouTube-watching. Covering all of these areas is
+out of scope for this manual, as it would balloon out of control and no longer
+be useful for me. I would recommend at least taking a Linux+ course (even if
+you don't get the cert) before attempting to start this journey. It will help
+you immensely. It should give you at least a shallow set of knowledge on all of
+these areas and prepare you well for Kubernetes.
+
+I recommend Shawn Powers' Linux+ video courses on YouTube and CBTNuggets.

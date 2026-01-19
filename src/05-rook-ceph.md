@@ -1,6 +1,6 @@
 # Rook Ceph
 
-Rook is a management interface for Ceph that can deploy it in a Kubernetes
+Rook is a management overlay for Ceph that can deploy it in a Kubernetes
 cluster. If you don't know what Ceph is, I highly recommend watching some of
 the videos on it by the guys at 45drives.
 
@@ -18,7 +18,7 @@ The more nuanced explanation:
   checks to make sure that all of your replicas actually have the same data. If
   two replicas say the data is "a", but one says it's "b", then chances are
   that "b" was supposed to be an "a". This solves both availability and
-  integrity problems.
+  integrity problems (like bitrot).
 - Now imagine that you could build an algorithm that takes into account the
   number of drives you have, the size of each one, the number of hosts you
   have, which drives were in which hosts, as well as your entire datacenter
@@ -30,7 +30,7 @@ The more nuanced explanation:
   redundancy requirements enforced when the data is created, but also as
   requirements and resource availability change.
 - Now imagine that you could build interfaces on top of this data storage
-  strategy, which exposes a filesystem, a block device, and an S3-compatible
+  strategy which exposes a filesystem, a block device, and an S3-compatible
   object store.
 
 That's Ceph.
@@ -185,6 +185,40 @@ spec:
   # keeping this off except when you need it.
   removeOSDsIfOutAndSafeToRemove: false
 ```
+
+### Install rook-ceph Krew Plugin
+
+Much of Ceph's administration post-install happens via CLI, so you'll want to
+make sure you have it. You can either deploy the "toolbox" container (the
+official docs go over this), or you can use the kubectl plugin. I recommend the
+plugin for simplicity. Assuming you installed `krew` from the tools section,
+you can get the rook-ceph plugin using the following command:
+
+```bash
+kubectl krew install rook-ceph
+```
+
+Now you can run ceph commands like so:
+
+```bash
+# `ceph status` becomes...
+kubectl rook-ceph ceph status
+```
+
+I recommend adding aliases to the rc file for whatever shell you use:
+
+```bash
+alias ceph='kubectl rook-ceph ceph'
+alias rbd='kubectl rook-ceph rbd'
+alias rados='kubectl rook-ceph rados'
+alias radosgw-admin='kubectl rook-ceph radosgw-admin'
+```
+
+This will cover most commands you might find in the official Ceph
+documentation. Ordinarily, you'd run these commands from a Ceph host, but since
+Rook is provisioning everything for us and we don't necessarily have direct
+access, it's a lot easier to use the plugin. This will run your commands in the
+"operator" container and attach stdio as if it were running locally.
 
 ### Add CephFS Filesystem
 
@@ -417,4 +451,6 @@ cephfs-pvc-test   Bound    pvc-e2a72895-e95f-4a69-a042-ecfe9480c5aa   1Gi       
 
 Congratulations! You've successfully set up CephFS as your container storage
 interface! Now, in the next session, you'll learn (among other things) how to
-set up an NFS server to access this new volume.
+set up an NFS server to access this new volume. If you decide not to set up
+NFS, you can go ahead and delete the PVC with
+`kubectl delete pvc cephfs-test-pvc`. Otherwise, continue to the next section.
