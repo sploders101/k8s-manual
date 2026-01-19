@@ -41,6 +41,7 @@ TODO: comparisons
 | Operating System (OS) | Talos Linux | ✅️ |
 | Container Runtime Interface (CRI) | Containerd | ✅️ |
 | Container Network Interface (CNI) | Calico | ✅️ |
+| Load Balancer | MetalLB | ❌️(recommended) |
 | Container Storage Interface (CSI) | Rook (Ceph) | ✅️ |
 | Certificate management | CertManager | ❌️ (recommended) |
 | Ingress / Gateway API controller | Traefik | ❌️ (recommended) |
@@ -69,3 +70,5 @@ you already have a solid foundation in the following areas:
   - VLANs
   - Firewalls
   - Routing
+  - DHCP
+  - ARP

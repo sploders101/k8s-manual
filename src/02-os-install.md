@@ -160,51 +160,6 @@ If you don't see all of your nodes (including the control plane), try again.
 It may take a little bit for them all to appear.
 
 
-## Add CNI (if not using Flannel)
-
-This step is only required if you opted out of using Flannel CNI. I will
-document the process for adding Calico, but if you choose to use something
-else, you can ignore this section and follow the instructions for the CNI you
-chose.
-
-Apply the tigera operator manifest:
-
-```bash
-kubectl create -f https://docs.tigera.io/calico/latest/manifests/tigera-operator.yaml
-```
-
-Next, you'll need a configuration for the operator to work with. Assuming this
-doesn't conflict with the IP address scheme you already have, this config will
-get you up and running quick & easy:
-
-```yaml
----
-# This section includes base Calico installation configuration.
-# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.Installation
-apiVersion: operator.tigera.io/v1
-kind: Installation
-metadata:
-  name: default
-spec:
-  # Configures Calico networking.
-  calicoNetwork:
-    ipPools:
-    - name: default-ipv4-ippool
-      blockSize: 26
-      cidr: 10.244.0.0/16
-      encapsulation: VXLANCrossSubnet
-      natOutgoing: Enabled
-      nodeSelector: all()
----
-# This section configures the Calico API server.
-# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
-apiVersion: operator.tigera.io/v1
-kind: APIServer
-metadata:
-  name: default
-spec: {}
-```
-
 ## Conclusion
 
 Congratulations! You have a cluster! Here's a brief summary of what we just did:
@@ -215,8 +170,8 @@ Congratulations! You have a cluster! Here's a brief summary of what we just did:
 - Write patch files for each node based on information we retrieved from the CLI
 - Install Talos into the nodes
 - Configure kubectl to control the Talos cluster
-- Install Calico CNI
-- Of the 4 main requirements for Kubernetes, we have installed:
-  - OS
-  - CRI
-  - CNI
+
+If you opted not to use Flannel, you won't have any networking just yet. Next,
+you'll install Calico CNI to provide your networking stack, and MetalLB to
+provide support for `LoadBalancer` services using gratuitous ARP to route
+packets.

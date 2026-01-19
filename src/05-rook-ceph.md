@@ -97,23 +97,31 @@ crds:
 If you choose to customize any values, make sure to add `-f values.yml` to the
 end of your install command.
 
-To install the Rook Ceph Operator Helm chart, use the following command:
+According to [the Talos Linux documentation](https://docs.siderolabs.com/kubernetes-guides/csi/ceph-with-rook#installation),
+the default configuration does not allow privileged pods. You'll need to create
+the namespace first to allow them:
+
+```yaml
+# kubectl apply -f <file>
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rook-ceph
+  labels:
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+```
+
+Ceph needs privileged pods to effectively manage disks on the host.
+
+Once that's done, install the Rook Ceph Operator Helm chart, use the following
+command:
 
 ```bash
 helm install --create-namespace --namespace rook-ceph rook-ceph rook-release/rook-ceph
 ```
-
-### Allow privileged pods in `rook-ceph` namespace
-
-According to [the Talos Linux documentation](https://docs.siderolabs.com/kubernetes-guides/csi/ceph-with-rook#installation),
-the default configuration does not allow privileged pods. You'll need to run
-the following command to allow them:
-
-```bash
-kubectl label namespace rook-ceph pod-security.kubernetes.io/enforce=privileged
-```
-
-Ceph needs privileged pods to effectively manage disks on the host.
 
 ### Install Rook Ceph Cluster
 
@@ -132,7 +140,7 @@ I'll be creating a cluster that spans the whole cluster and consumes all
 unpartitioned disks.
 
 ```yaml
-# Applied with kubectl apply -f <file>
+# kubectl apply -f <file>
 ---
 apiVersion: ceph.rook.io/v1
 kind: CephCluster
@@ -197,10 +205,8 @@ due to certain operational requirements (and the simplicity of doing so), I
 like to keep all of my storage mechanisms in the same CephFS filesystem. I'll
 get to why this is important in a moment.
 
-Rook supports 3 main device classes, and auto-detects which one each OSD
-belongs to during OSD preparation. These classes are `nvme`, `ssd`, and `hdd`.
-`nvme` is specifically for NVMe SSD drives, while `ssd` is for lower-class SSDs
-like those with SATA interfaces, and `hdd` is for spinning hard drives. CephFS
+Rook supports 2 main device classes, and auto-detects which one each OSD
+belongs to during OSD preparation. These classes are `ssd` and `hdd`. CephFS
 supports storing data on devices of multiple classes, but ***THESE MUST BE
 DETERMINED UPFRONT***! If you fail to specify your device classes upfront,
 you'll have to resort to manual editing of your CRUSH map, and even then, the
@@ -210,23 +216,23 @@ across both SSDs and HDDs, but this will likely yield a weird and sub-par
 experience. In summary, ***PLEASE*** specify your storage classes, even if you
 only have one right now. You'll thank me later...
 
-I recommend always storing metadata on either nvme or ssd storage classes. This
-is a heavy random I/O operation, which is what SSDs were designed for, as
-opposed to spinning disk drives which are better for bulk storage and
-sequential I/O. If you have enough space, I also recommend making this your
-default storage medium altogether, since you'll usually have more control over
-the provisioning of mass storage volumes than database volumes, and databases
-do a lot of random I/O.
+I recommend always storing metadata on ssd storage classes. This is a heavy
+random I/O operation, which is what SSDs were designed for, as opposed to
+spinning disk drives which are better for bulk storage and sequential I/O. If
+you have enough space, I also recommend making this your default storage medium
+altogether, since you'll usually have more control over the provisioning of
+mass storage volumes than database volumes, and databases do a lot of random
+I/O.
 
 #### CephFS Definition
 
 Here is the definition I use. I use ec-2-1 for massive data that I'd like to be
 highly available, but could be taken down and restored from a backup if it
-needs to be. I then have two data pools: one for nvme, and one for hdd with 3
+needs to be. I then have two data pools: one for ssd, and one for hdd with 3
 replicas for normal storage.
 
 ```yaml
-# Applied with kubectl apply -f <file>
+# kubectl apply -f <file>
 ---
 apiVersion: ceph.rook.io/v1
 kind: CephFilesystem
@@ -236,28 +242,28 @@ metadata:
 spec:
   # The metadata pool spec
   metadataPool:
-    deviceClass: nvme
+    deviceClass: ssd
     replicated:
       # You need at least three OSDs on different nodes for this config to work
       size: 3
   # The list of data pool specs
   dataPools:
-    - name: replicate-3-nvme
-      deviceClass: nvme
+    - name: replicate-3-ssd
+      deviceClass: ssd
       replicated:
         size: 3
-    - name: replicate-3-hdd
-      deviceClass: hdd
-      replicated:
-        size: 3
-    # You need at least three OSDs on different nodes for this config to work
-    - name: ec-2-1-hdd
-      deviceClass: hdd
-      erasureCoded:
-        dataChunks: 2
-        codingChunks: 1
-      parameters:
-        compression_mode: none
+~    - name: replicate-3-hdd
+~      deviceClass: hdd
+~      replicated:
+~        size: 3
+~    # You need at least three OSDs on different nodes for this config to work
+~    - name: ec-2-1-hdd
+~      deviceClass: hdd
+~      erasureCoded:
+~        dataChunks: 2
+~        codingChunks: 1
+~      parameters:
+~        compression_mode: none
   # Whether to preserve filesystem after CephFilesystem CRD deletion
   preserveFilesystemOnDelete: true
   metadataServer:
@@ -298,12 +304,14 @@ PVC provisioning. For my configuration above, I add the following storage
 classes (all but one hidden for brevity):
 
 ```yaml
-# Applied with kubectl apply -f <file>
+# kubectl apply -f <file>
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: rook-kubefs-replicate-3-nvme
+  name: rook-kubefs-replicate-3-ssd
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: rook-ceph.cephfs.csi.ceph.com # csi-provisioner-name
 parameters:
   # matches the name of the CephCluster resource
@@ -311,7 +319,7 @@ parameters:
   # matches the name of the CephFilesystem resource
   fsName: kubefs
   # matches the name of a dataPool object within the CephFilesystem resource
-  pool: kubefs-replicate-3-nvme
+  pool: kubefs-replicate-3-ssd
 
   # The secrets contain Ceph admin credentials. These are generated automatically by the operator
   # in the same namespace as the cluster.
@@ -372,3 +380,41 @@ allowVolumeExpansion: true
 ~reclaimPolicy: Delete
 ~allowVolumeExpansion: true
 ```
+
+# Testing the Filesystem
+
+To test your brand new filesystem, create a `PersistentVolumeClaim` and see
+what happens:
+
+```yaml
+# kubectl apply -f <file>
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cephfs-pvc-test
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+Then look at it using this command:
+
+```bash
+kubectl get pvcs
+```
+
+If you see something like this with status=Bound:
+
+```
+NAME              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS                  VOLUMEATTRIBUTESCLASS   AGE
+cephfs-pvc-test   Bound    pvc-e2a72895-e95f-4a69-a042-ecfe9480c5aa   1Gi        RWX            rook-kubefs-replicate-3-ssd   <unset>                 4s
+```
+
+Congratulations! You've successfully set up CephFS as your container storage
+interface! Now, in the next session, you'll learn (among other things) how to
+set up an NFS server to access this new volume.

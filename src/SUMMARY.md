@@ -1,7 +1,8 @@
 # Summary
 
 - [Introduction](./01-introduction.md)
-- [Initial Bringup (OS, CRI, CNI)](./02-initial-bringup.md)
+- [Initial Bringup (OS, CRI)](./02-os-install.md)
 - [Helm](./03-helm.md)
-- [Rook Ceph (CSI)](./04-rook-ceph.md)
-  - [Rook Ceph Continued...](./04.01-rook-ceph-cont.md)
+- [Networking (CNI, LB)](./04-networking.md)
+- [Rook Ceph (CSI)](./05-rook-ceph.md)
+  - [Rook Ceph Continued...](./05.01-rook-ceph-cont.md)
