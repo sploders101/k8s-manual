@@ -24,6 +24,17 @@ installation:
 Next, install the operator:
 
 ```bash
+kubectl apply -f- << EOF
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tigera-operator
+  labels:
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+EOF
 helm repo add projectcalico https://docs.tigera.io/calico/charts
 helm install \
   --create-namespace \

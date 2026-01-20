@@ -7,7 +7,18 @@ bring-up process for Talos Linux using my chosen Kubernetes stack.
 
 ## Generate base configs
 
-TODO
+[Official Docs](https://docs.siderolabs.com/talos/v1.12/getting-started/prodnotes#step-5%3A-generate-secrets-bundle)
+
+First, you'll need to generate the base configurations for Talos. To do this,
+cd to a directory where you are comfortable storing secrets and run the
+following commands:
+
+```bash
+talosctl gen secrets -o secrets.yaml
+talosctl gen config --with-secrets secrets.yaml <cluster_name> https://<kubernetes_endpoint>:6443
+talosctl config merge ./talosconfig
+talosctl config endpoint <kubernetes_endpoint ...>
+```
 
 
 ## Get an install image
@@ -147,7 +158,7 @@ progress of cluster bring-up. Use the following command to add the Talos
 cluster to your kubectl contexts:
 
 ```bash
-talosctl config merge ./talosconfig
+talosctl kubeconfig --nodes <control_plane_ip>
 ```
 
 Now, you can use the following command to see the nodes in the cluster:

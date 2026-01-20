@@ -16,9 +16,9 @@ allowing you to easily add, remove, and update without having to worry about
 things like cleaning up garbage from old package versions.
 
 We won't be interacting with Helm directly much in this guide - just for
-installing the absolute essentials - because there's another tool called FluxCD
-that will allow you to track your manifests, Helm charts, etc from a git
-repository.
+installing the CNI and for rendering templates - because there's another tool
+called FluxCD that will allow you to track your manifests, Helm charts, etc
+from a git repository.
 
 
 ### Basic Concepts
