@@ -120,7 +120,7 @@ Once that's done, install the Rook Ceph Operator Helm chart, use the following
 command:
 
 ```bash
-helm install --create-namespace --namespace rook-ceph rook-ceph rook-release/rook-ceph
+helm install --namespace rook-ceph rook-ceph rook-release/rook-ceph
 ```
 
 ### Install Rook Ceph Cluster

@@ -128,21 +128,9 @@ node_patch_files are the patch files you created in the previous step. I
 recommend having one for each node.
 
 
-## Configure the kubernetes endpoint & bootstrap
+## Bootstrap
 
-Next, you'll want to configure the kubernetes endpoint. This can be an IP
-address, a series of IP addresses, or a DNS name resolving to one or more IP
-addresses or load balancers. If you have the ability to set DNS records on your
-home network, I recommend this approach. I'm not sure how well Talos does with
-reconfiguration of this value, but the kubeadm docs say it cannot be changed.
-Using DNS will allow you to edit this value later.
-
-```bash
-talosctl config endpoint <control_plane_name_or_ip ...>
-```
-
-Once that's configured, you can bootstrap the cluster using the following
-command:
+Now you can bootstrap the cluster using the following command:
 
 ```bash
 talosctl bootstrap --nodes <control_plane_ip>
