@@ -19,7 +19,6 @@ installation:
     ipPools:
       - cidr: 10.244.0.0/16
         encapsulation: VXLAN
-    linuxDataplane: "BPF"
 ```
 
 Next, install the operator:
